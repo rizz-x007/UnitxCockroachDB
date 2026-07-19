@@ -1,0 +1,61 @@
+/* =========================================================
+   UniThrift — PRIVACY POLICY (page-specific)
+   Requires theme.css to be loaded first.
+   ========================================================= */
+
+.page-wrap { max-width: 800px; }
+.page-hero { text-align: left; margin-bottom: 40px; }
+.page-hero h1 { font-size: 2.2rem; }
+
+.section { margin-bottom: 32px; }
+.section h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+}
+.section h2 i { color: var(--accent); font-size: 1.1rem; }
+.section p, .section li { font-size: 0.95rem; color: var(--muted); line-height: 1.85; }
+.section ul { padding-left: 20px; display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.section p + p { margin-top: 12px; }
+
+.data-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.9rem; }
+.data-table th {
+    background: var(--input-bg);
+    color: var(--text);
+    font-weight: 600;
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+}
+.data-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    vertical-align: top;
+    line-height: 1.6;
+}
+.data-table tr:last-child td { border-bottom: none; }
+
+.rights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+.right-item {
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    transition: background 0.3s, border-color 0.3s;
+}
+.right-item i { color: var(--accent); margin-bottom: 8px; display: block; font-size: 1.1rem; }
+.right-item h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+.right-item p { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+
+@media (max-width: 768px) {
+    .page-hero h1 { font-size: 1.8rem; }
+    .rights-grid { grid-template-columns: 1fr; }
+    .data-table { display: block; overflow-x: auto; }
+}

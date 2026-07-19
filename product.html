@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniThrift | Product Details</title>
+
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="/css/product.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body class="dark-theme">
+
+    <nav class="navbar">
+      <div class="navbar-inner">
+        <div class="brand-group">
+            <div class="logo">
+                <img src="/images/logo.jpg" alt="UniThrift" class="logo-mark">
+                UniThrift<span class="logo-version">2.0</span>
+            </div>
+            <!-- University search, backed by /api/geoapify/autocomplete -->
+            <div class="campus-select" id="campusSelectWrap">
+                <i class="fas fa-location-dot campus-select-icon"></i>
+                <input type="text" id="universitySelect" aria-label="Search your university" placeholder="Select your University" autocomplete="off">
+                <i class="fas fa-chevron-down campus-select-caret"></i>
+                <div class="campus-select-dropdown" id="campusSelectDropdown"></div>
+            </div>
+        </div>
+        <div class="nav-actions">
+            <button class="theme-switch" id="themeToggle" aria-label="Toggle theme">
+                <i class="fas fa-sun"></i>
+                <span class="theme-switch-knob"></span>
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="icon-btn" id="cartBtn" style="position: relative;">
+                <i class="fas fa-cart-shopping"></i>
+                <span id="cartBadge">0</span>
+            </button>
+            <button class="icon-btn" id="profileBtn">
+                <i class="fas fa-user"></i>
+            </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hover-reveal side navigation (Pure Fixed-position overlay) -->
+    <aside class="side-nav" id="sideNav">
+        <nav class="side-nav-links">
+            <a href="/marketplace" class="side-nav-link">
+                <i class="fas fa-store"></i><span>Marketplace</span>
+            </a>
+            <a href="/updates" class="side-nav-link">
+                <i class="fas fa-bell"></i><span>Updates</span>
+            </a>
+            <a href="/sell" class="side-nav-link">
+                <i class="fas fa-circle-plus"></i><span>Sell an Item</span>
+            </a>
+            <a href="/chatbot" class="side-nav-link">
+                <i class="fas fa-robot"></i><span>UniThrift Chatbot</span>
+            </a>
+            <a href="/about" class="side-nav-link">
+                <i class="fas fa-circle-info"></i><span>About</span>
+            </a>
+            <a href="/help" class="side-nav-link">
+                <i class="fas fa-circle-question"></i><span>Help</span>
+            </a>
+        </nav>
+    </aside>
+
+    <main class="product-container">
+
+        <!-- LEFT : IMAGES -->
+        <section class="gallery-section">
+            <img id="mainImage" class="main-image" src="" alt="Product Image">
+            <div id="thumbnailContainer" class="thumbnail-container"></div>
+        </section>
+
+        <!-- RIGHT : PRODUCT DETAILS -->
+        <section class="details-section">
+            <h1 id="productTitle">Loading...</h1>
+            <div id="productPrice" class="price"></div>
+            <div id="productCondition" class="condition"></div>
+
+            <div class="info-card">
+                <h3>Product Details</h3>
+                <p>
+                    <strong>Delivery:</strong>
+                    <span id="deliveryDate"></span>
+                </p>
+                <p>
+                    <strong>Payment:</strong>
+                    <span id="paymentMethods"></span>
+                </p>
+            </div>
+
+            <div class="action-buttons">
+                <!-- Buying action: fully separate from chat, no meetup/contact info mixed in -->
+                <div class="buy-actions">
+                    <button id="addCartBtn">
+                        Add To Cart
+                    </button>
+                </div>
+                <!-- Chat action: the single channel for discussing pickup, price, or questions -->
+                <div class="chat-actions">
+                    <button id="chatWithSellerBtn" class="chat-seller-trigger">
+                        <i class="fa-solid fa-comments"></i> Chat with Seller
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- DESCRIPTION -->
+    <section class="description-section">
+        <h2>Description</h2>
+        <div id="productDescription"></div>
+    </section>
+
+    <!-- SELLER -->
+    <section class="seller-section">
+        <h2>Seller Information</h2>
+        <div id="sellerInfo"></div>
+    </section>
+
+    <!-- AI INSIGHTS -->
+    <section class="ai-insights-section">
+        <h2> AI Product Insights</h2>
+        <div id="aiInsights" class="ai-card loading">
+            <div class="ai-loading">
+                <div class="spinner"></div>
+                <h3>Generating AI Summary...</h3>
+                <p>
+                    UniThrift AI is analysing this product, its description,
+                    pricing and customer reviews.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="reviews-section">
+        <h2>Reviews</h2>
+        <div id="reviewsContainer"></div>
+    </section>
+
+    <!-- REVIEW FORM -->
+    <section class="review-form-section">
+        <h2>Leave a Review</h2>
+        <form id="reviewForm">
+            <label>Rating</label>
+            <select id="rating" required>
+                <option value="">Select Rating</option>
+                <option value="1">1 Star</option>
+                <option value="2">2 Stars</option>
+                <option value="3">3 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="5">5 Stars</option>
+            </select>
+
+            <label>Review</label>
+            <textarea id="reviewText" rows="5" placeholder="Write your review..." required></textarea>
+
+            <button type="submit">Submit Review</button>
+        </form>
+    </section>
+
+    <!-- CART MODAL -->
+    <div id="cartModal" class="cart-modal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h2>Your Cart</h2>
+                <button id="closeCart" class="close-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="cartItems">
+                <div class="empty-cart">Empty Cart</div>
+            </div>
+            <div id="cartFooter">
+                <button id="placeOrderBtn">Place Order</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHAT POPUP -->
+    <div id="chatPopup" class="chat-popup">
+        <div class="chat-header">
+            <div class="chat-seller-meta">
+                <div class="chat-avatar-wrap">
+                    <img id="chatSellerAvatar" class="chat-avatar" src="" alt="Seller">
+                    <span id="chatOnlineIndicator" class="online-indicator"></span>
+                </div>
+                <div class="chat-seller-text">
+                    <span id="chatSellerName">Seller Chat</span>
+                    <span id="chatVerifiedBadge" class="verified-badge" style="display:none;">
+                        <i class="fa-solid fa-circle-check"></i> Verified
+                    </span>
+                </div>
+            </div>
+            <button id="closeChatBtn" class="close-chat-btn">&times;</button>
+        </div>
+
+        <a id="chatProductCard" class="chat-product-card" href="#" target="_blank" rel="noopener">
+            <img id="chatProductImage" class="chat-product-thumb" src="" alt="">
+            <div class="chat-product-info">
+                <span id="chatProductTitle" class="chat-product-title"></span>
+                <span id="chatProductPrice" class="chat-product-price"></span>
+            </div>
+            <span class="chat-view-listing">View Listing →</span>
+        </a>
+
+        <div id="chatMessages" class="chat-messages">
+            <div class="message system-msg">
+                Welcome to campus chat! Protect your data.
+            </div>
+        </div>
+
+        <form id="chatForm" class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Type a message..." autocomplete="off" required>
+            <button id="sendChatBtn" type="submit">Send</button>
+        </form>
+    </div>
+
+    <footer>
+        <p>© 2026 UniThrift. All Rights Reserved.</p>
+    </footer>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- CONFIRMATION MODAL -->
+    <div id="confirmModal" class="confirm-modal-overlay">
+        <div class="confirm-modal-box">
+            <div class="confirm-modal-icon"><i class="fas fa-triangle-exclamation"></i></div>
+            <h3 id="confirmModalTitle">Are you sure?</h3>
+            <p id="confirmModalMessage">This action cannot be undone.</p>
+            <div class="confirm-modal-actions">
+                <button id="confirmModalCancel" class="confirm-btn confirm-btn--ghost">Cancel</button>
+                <button id="confirmModalOk" class="confirm-btn confirm-btn--danger">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="/js/auth-fetch.js"></script>
+    <script src="/js/product.js"></script>
+</body>
+
+</html>

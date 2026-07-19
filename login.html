@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script>
+        // Cloudflare Turnstile loads async and calls this the instant it's ready,
+        // which can race ahead of /js/login.js (loaded at the bottom of body).
+        // This stub guarantees the callback exists, then hands off to the real
+        // renderTurnstile() once login.js has defined it.
+        window.onloadTurnstileCallback = function () {
+            window.__turnstileReady = true;
+            if (typeof window.renderTurnstile === "function") window.renderTurnstile();
+        };
+    </script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback&render=explicit" async defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniThrift | Login</title>
+    
+    <link rel="stylesheet" href="/css/login.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+
+<body>
+<div class="container">
+    <div class="left-panel">
+        <div class="overlay"></div>
+        <div class="hero-content">
+            <h1 class="logo">UniThrift</h1>
+            <h2 class="typing-text">
+                <span id="animated-text"></span>
+            </h2>
+            <ul>
+                <li><i class="fa-solid fa-book-open list-icon"></i> Buy quality used textbooks at student-friendly prices</li>
+                <li><i class="fa-solid fa-laptop list-icon"></i> Find electronics, gadgets and accessories</li>
+                <li><i class="fa-solid fa-bed-front list-icon"></i> Furnish your hostel room without overspending</li>
+                <li><i class="fa-solid fa-seedling list-icon"></i> Give unused items a second life</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="right-panel">
+        <div class="form-box">
+            <div class="form-header">
+                <span class="badge">VERIFIED CAMPUS MARKETPLACE</span>
+                <h2 id="formTitle">Welcome Back</h2>
+                <p>Continue buying and selling within your trusted student community.</p>
+            </div>
+
+            <div class="form-body">
+                <form id="loginForm">
+                    <div class="input-group">
+                        <label>Email Address</label>
+                        <i class="fa-solid fa-envelope input-icon"></i>
+                        <input type="text" id="loginIdentifier" placeholder="Enter your email" autocomplete="username" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Password</label>
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" required>
+                        <button type="button" class="toggle-pw" id="toggleLoginPw" tabindex="-1">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+
+                    <div class="forgot-password">
+                        <a href="#">Forgot Password?</a>
+                    </div>
+
+                    <p id="loginError" class="form-error" style="display:none;"></p>
+                    
+                    <button type="submit" class="submit-btn" id="loginSubmitBtn">
+                        Continue <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+                
+                <form id="signupForm" style="display:none;">
+                    <div class="input-group">
+                        <label>Username</label>
+                        <i class="fa-solid fa-user input-icon"></i>
+                        <input type="text" id="signupUsername" placeholder="Choose a username" autocomplete="username" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Email Address</label>
+                        <i class="fa-solid fa-envelope input-icon"></i>
+                        <input type="email" id="signupEmail" placeholder="Enter your email" autocomplete="email" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Password</label>
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" id="signupPassword" placeholder="Create a password" autocomplete="new-password" required>
+                        <button type="button" class="toggle-pw" id="toggleSignupPw" tabindex="-1">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Confirm Password</label>
+                        <i class="fa-solid fa-shield-halved input-icon"></i>
+                        <input type="password" id="signupConfirm" placeholder="Confirm your password" autocomplete="new-password" required>
+                    </div>
+
+                    <p id="signupError" class="form-error" style="display:none;"></p>
+                    
+                    <button type="submit" class="submit-btn" id="signupSubmitBtn">
+                        Create Account <i class="fa-solid fa-user-plus"></i>
+                    </button>
+                </form>
+
+                <form id="otpForm" style="display:none;">
+                    <div class="otp-intro">
+                        <i class="fa-solid fa-envelope-circle-check otp-icon"></i>
+                        <p>Enter the 6-digit code we sent to<br><strong id="otpEmailDisplay"></strong></p>
+                    </div>
+
+                    <div class="otp-box-group" id="otpBoxGroup">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp-box" data-index="0" autocomplete="one-time-code">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp-box" data-index="1">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp-box" data-index="2">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp-box" data-index="3">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp-box" data-index="4">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp-box" data-index="5">
+                    </div>
+
+                    <p id="otpError" class="form-error" style="display:none;"></p>
+
+                    <button type="submit" class="submit-btn" id="otpSubmitBtn">
+                        Verify Email <i class="fa-solid fa-check"></i>
+                    </button>
+
+                    <p class="otp-resend-row">
+                        <span id="otpResendIdle">
+                            Didn't get a code? <a href="#" id="otpResendBtn">Resend code</a>
+                        </span>
+                        <span id="otpResendTimer" style="display:none;"></span>
+                    </p>
+
+                    <p class="toggle-text">
+                        <a href="#" id="otpBackBtn"><i class="fa-solid fa-arrow-left"></i> Back to login</a>
+                    </p>
+                </form>
+
+                <p id="statusMsg" style="display:none;"></p>
+
+                <div class="divider" id="socialDivider">
+                    <span>Continue with</span>
+                </div>
+
+                <button type="button" id="googleLoginBtn" class="google-btn">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                    Continue with Google
+                </button>
+
+                <p class="toggle-text" id="toggleTextRow">
+                    <span id="toggleText">Don't have an account?</span>
+                    <a href="#" id="toggleBtn">Sign Up</a>
+                </p>
+
+                <div class="card-footer">
+                    <p>Trusted by students across campus.</p>
+                    <small>
+                        By continuing, you agree to our <a href="#">Terms</a> & <a href="#">Privacy Policy</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/login.js"></script>
+</body>
+</html>

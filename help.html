@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniThrift | Help Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="/css/help.css">
+    <script>
+        document.documentElement.className = localStorage.getItem("theme") || "dark-theme";
+    </script>
+</head>
+<body class="dark-theme">
+<nav class="navbar">
+    <a href="/marketplace" class="logo" style="display: flex; align-items: center;">
+    <img src="/images/logo.jpg" alt="UniThrift Logo" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 10px rgba(139, 92, 246, 0.25);">
+</a>
+    <div class="nav-center">
+        <a href="/marketplace">Browse</a>
+        <button class="theme-toggle-link" id="navbarThemeToggle" type="button">
+            <i class="fas fa-sun"></i><i class="fas fa-moon"></i>
+            <span>Theme</span>
+        </button>
+        <a href="#">Deals</a>
+        <a href="/updates">Updates</a>
+    </div>
+    <div class="nav-right">
+        <button class="nav-icon-btn" onclick="window.location.href='/marketplace'"><i class="fas fa-store"></i></button>
+        <button class="nav-icon-btn" onclick="window.location.href='/profile'"><i class="fas fa-user"></i></button>
+    </div>
+</nav>
+
+<div class="page-wrap">
+
+    <div class="page-hero">
+        <h1>Help Center</h1>
+        <p>Find answers, guides, and support for everything UniThrift.</p>
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="faqSearch" placeholder="Search help articles..." oninput="filterFAQs(this.value)">
+        </div>
+    </div>
+
+    <div class="topic-grid">
+        <div class="topic-card" onclick="scrollToTopic('getting-started')"><i class="fas fa-rocket"></i><h3>Getting Started</h3><p>Create account, verify, browse</p></div>
+        <div class="topic-card" onclick="scrollToTopic('selling')"><i class="fas fa-tag"></i><h3>Selling</h3><p>List items, pricing, handover</p></div>
+        <div class="topic-card" onclick="scrollToTopic('buying')"><i class="fas fa-cart-shopping"></i><h3>Buying</h3><p>Find items, contact sellers</p></div>
+        <div class="topic-card" onclick="scrollToTopic('verification')"><i class="fas fa-shield-halved"></i><h3>Verification</h3><p>ID checks, PAN, seller access</p></div>
+        <div class="topic-card" onclick="scrollToTopic('chat')"><i class="fas fa-comment"></i><h3>Chat & Messages</h3><p>Messaging, notifications</p></div>
+        <div class="topic-card" onclick="scrollToTopic('account')"><i class="fas fa-user-gear"></i><h3>Account</h3><p>Profile, password, logout</p></div>
+    </div>
+
+    <!-- GETTING STARTED -->
+    <div class="faq-section" id="getting-started">
+        <h2><i class="fas fa-rocket"></i> Getting Started</h2>
+
+        <div class="faq-item">
+            <div class="faq-q">How do I create an account? <i class="fas fa-chevron-down arrow"></i></div>
+            <div class="faq-a">Go to the UniThrift login page and sign up with your email or use Google Sign-In. Once registered, you can browse the marketplace immediately. To sell items, you'll need to complete student and seller verification from your profile.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">Is UniThrift free to use? <i class="fas fa-chevron-down arrow"></i></div>
+            <div class="faq-a">Yes, completely free. There are no listing fees, no commissions, and no subscription charges. You keep 100% of what you earn from sales.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">Who can use UniThrift? <i class="fas fa-chevron-down arrow"></i></div>
+            <div class="faq-a">UniThrift is built for students, faculty, and staff of Indian colleges and universities. You need a valid College ID to verify your student status and gain access to selling features.</div>
+        </div>
+    </div>
+
+    <!-- SELLING -->
+    <div class="faq-section" id="selling">
+        <h2><i class="fas fa-tag"></i> Selling</h2>
+
+        <div class="faq-item">
+            <div class="faq-q">How do I list an item? <i class="fas fa-chevron-down arrow"></i></div>
+            <div class="faq-a">Once seller-verified, click "Sell an Item" from the navbar or marketplace. Fill in the title, category, condition, price, description, and upload photos. Your listing goes live immediately after submission.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">What should I price my item at? <i class="fas fa-chevron-down arrow"></i></div>
+            <div class="faq-a">A good rule of thumb is 40–60% of the original price for items in good condition, and 20–30% for fair condition. Check similar listings on the marketplace to gauge competitive pricing.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">How do I mark an item as sold? <i class="fas fa-chevron-down arrow"></i></div>
+            <div class="faq-a">Go to your Profile → My Listings, open the item, and click "Mark as Sold". This removes it from the active marketplace and notifies the buyer if they were in a chat with you.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">Where should I meet buyers? <i class="fas fa-chevron-down arrow"></i></div>
+            <div class="faq-a">Always meet in public, well-lit locations on campus — libraries, canteens, or college reception areas are ideal. Never share your home address with buyers you don't know personally.</div>
+        </div>
+    </div>
+
+    <!-- BUYING -->
+    <div class="faq-section" id="buying">
+        <h2><i class="fas fa-cart-shopping"></i> Buying</h2>
+
+        <div class="faq-item">
+            <div class="faq-q">How do I contact a seller? <i class="fas fa-chevron-down arrow"></i></div>
+            <div class="faq-a">Click "Quick View" on any listing and then "Message Seller". This opens a private chat room between you and the seller. All messages are real-time.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">How do I pay for items? <i class="fas fa-chevron-down arrow"></i></div>
+            <div class="faq-a">UniThrift does not process payments directly. Payments happen between you and the seller — typically cash on handover or UPI transfer using the seller's QR code. Always confirm the item before paying.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">What if the item isn't as described? <i class="fas fa-chevron-down arrow"></i></div>
+            <div class="faq-a">Inspect items before completing payment. If you believe a seller misrepresented an item, contact our support team with your chat logs and we'll investigate. Repeatedly fraudulent sellers are banned.</div>
+        </div>
+    </div>
+
+    <!-- VERIFICATION -->
+    <div class="faq-section" id="verification">
+        <h2><i class="fas fa-shield-halved"></i> Verification</h2>
+
+        <div class="faq-item">
+            <div class="faq-q">Why is my College ID being rejected? <i class="fas fa-chevron-down arrow"></i></div>
+            <div class="faq-a">Our AI checks that the uploaded document is a genuine College ID card — it must clearly show your institution name, your photo, and a student/roll number. Make sure the image is well-lit, not blurry, and shows the full card. Screenshots of digital ID apps may be rejected; use a photo of the physical card.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">Why is my PAN card being rejected? <i class="fas fa-chevron-down arrow"></i></div>
+            <div class="faq-a">The AI looks for Income Tax Department branding, the 10-character PAN number (format: AAAAA9999A), your name, and date of birth. Upload a clear photo of the physical PAN card — not Aadhaar, not driving licence, not a screenshot of an app.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">How long does verification take? <i class="fas fa-chevron-down arrow"></i></div>
+            <div class="faq-a">AI pre-screening is instant. Human admin review typically takes 24–48 hours. You'll receive a notification in your Updates feed once your verification status changes.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">Is my PAN card data safe? <i class="fas fa-chevron-down arrow"></i></div>
+            <div class="faq-a">Yes. Verification documents are stored in a private Supabase storage bucket — they are never publicly accessible. Only UniThrift administrators can view them for review purposes.</div>
+        </div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="faq-section" id="chat">
+        <h2><i class="fas fa-comment"></i> Chat & Messages</h2>
+
+        <div class="faq-item">
+            <div class="faq-q">I'm a seller — how do I reply to buyers? <i class="fas fa-chevron-down arrow"></i></div>
+            <div class="faq-a">Go to your Profile or the Chat page. All incoming buyer messages appear in your chat inbox. Open the conversation and reply directly — the same chat interface works for both buyers and sellers.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">Why am I not getting message notifications? <i class="fas fa-chevron-down arrow"></i></div>
+            <div class="faq-a">Check your Updates page (/updates) for all notifications. Real-time push requires your browser to keep the tab open. If you're missing notifications, try refreshing your Updates page — they'll load from the server even if the real-time push was missed.</div>
+        </div>
+    </div>
+
+    <!-- ACCOUNT -->
+    <div class="faq-section" id="account">
+        <h2><i class="fas fa-user-gear"></i> Account</h2>
+
+        <div class="faq-item">
+            <div class="faq-q">I keep getting logged out — why? <i class="fas fa-chevron-down arrow"></i></div>
+            <div class="faq-a">Session tokens expire after a period of inactivity. UniThrift automatically refreshes them when you're active. If you're being logged out repeatedly, clear your browser's localStorage and log in again. If the issue persists, contact support.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">How do I change my profile photo? <i class="fas fa-chevron-down arrow"></i></div>
+            <div class="faq-a">Go to Profile and click the camera icon on your avatar. Select an image from your device — it uploads automatically and updates across all your listings.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">How do I delete my account? <i class="fas fa-chevron-down arrow"></i></div>
+            <div class="faq-a">Email us at rizzmax.hacks@gmail.com with the subject "Account Deletion Request" from your registered email address. We'll process deletion within 7 business days and confirm once complete.</div>
+        </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="faq-section">
+        <h2><i class="fas fa-headset"></i> Still need help?</h2>
+        <div class="contact-grid">
+            <div class="contact-card">
+                <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                <div>
+                    <h4>Email Support</h4>
+                    <p>We reply within 24–48 hours.</p>
+                    <a href="mailto:rizzmax.hacks@gmail.com">rizzmax.hacks@gmail.com</a>
+                </div>
+            </div>
+            <div class="contact-card">
+                <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                <div>
+                    <h4>Phone Support</h4>
+                    <p>Available Mon–Sat, 10am–6pm IST.</p>
+                    <a href="tel:+919674969118">+91 96749 69118</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer class="site-footer">
+    <p>© 2026 UniThrift. For students, by students.</p>
+    <div class="footer-links">
+        <a href="/about">About</a>
+        <a href="/terms">Terms</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/help">Help</a>
+    </div>
+</footer>
+
+<script>
+// Apply saved theme to body once DOM is ready
+document.body.className = localStorage.getItem("theme") || "dark-theme";
+document.getElementById("navbarThemeToggle").addEventListener("click", () => {
+    const next = document.body.classList.contains("dark-theme") ? "light-theme" : "dark-theme";
+    document.body.className = next;
+    document.documentElement.className = next;
+    localStorage.setItem("theme", next);
+});
+
+// FAQ accordion
+document.querySelectorAll('.faq-q').forEach(q => {
+    q.addEventListener('click', () => {
+        const item = q.parentElement;
+        const wasOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+        if (!wasOpen) item.classList.add('open');
+    });
+});
+
+// Topic card scroll
+function scrollToTopic(id) {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// FAQ search filter
+function filterFAQs(query) {
+    const q = query.toLowerCase().trim();
+    document.querySelectorAll('.faq-item').forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = (!q || text.includes(q)) ? '' : 'none';
+    });
+}
+</script>
+</body>
+</html>

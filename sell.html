@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>UniThrift | Sell Item</title>
+
+    <link rel="stylesheet" href="/css/sell.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo" style="display: flex; align-items: center; gap: 9px; font-weight: 700; color: var(--text);">
+    <img src="/images/logo.jpg" alt="UniThrift" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover;">
+    UniThrift
+</div>
+
+        <div class="nav-links">
+
+            <a href="/marketplace">
+                Marketplace
+            </a>
+
+            <a href="/profile">
+                Profile
+            </a>
+
+            <a href="/sell">
+                Sell Item
+            </a>
+
+        </div>
+
+    </nav>
+
+    <section class="sell-container">
+
+        <div class="sell-card">
+
+            <h1>
+                Create Listing
+            </h1>
+
+            <form id="sellForm">
+
+                <input
+                    type="text"
+                    id="title"
+                    placeholder="Product Name"
+                    required>
+
+                <select
+                    id="category"
+                    required>
+
+                    <option value="">
+                        Select Category
+                    </option>
+
+                    <option>
+                        Books
+                    </option>
+
+                    <option>
+                        Electronics
+                    </option>
+
+                    <option>
+                        Lab Equipment
+                    </option>
+
+                    <option>
+                        Notes
+                    </option>
+
+                    <option>
+                        Hostel Items
+                    </option>
+
+                    <option>
+                        Uniforms
+                    </option>
+
+                </select>
+
+                <input
+                    type="number"
+                    id="price"
+                    placeholder="Price"
+                    required>
+
+                <select
+                    id="condition"
+                    required>
+
+                    <option value="">
+                        Product Condition
+                    </option>
+
+                    <option>
+                        Like New
+                    </option>
+
+                    <option>
+                        Excellent
+                    </option>
+
+                    <option>
+                        Good
+                    </option>
+
+                    <option>
+                        Fair
+                    </option>
+
+                </select>
+
+                <textarea
+                    id="description"
+                    rows="6"
+                    placeholder="Description"
+                    required>
+                </textarea>
+
+                <!-- Mandatory Campus Autocomplete Selection -->
+                <div class="campus-select-container" style="position: relative; width: 100%; margin-bottom: 1rem;">
+                    <input
+                        type="text"
+                        id="collegeName"
+                        placeholder="College / University Name"
+                        autocomplete="off"
+                        required>
+                    <div class="campus-select-dropdown" id="sellCampusDropdown" style="
+                        position: absolute;
+                        top: 100%;
+                        left: 0;
+                        width: 100%;
+                        max-height: 200px;
+                        overflow-y: auto;
+                        background: var(--card, #fff);
+                        border: 1px solid var(--border, #ccc);
+                        border-radius: 8px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                        z-index: 99;
+                        display: none;
+                        padding: 4px;
+                    "></div>
+                </div>
+
+                <input
+                    type="tel"
+                    id="contactNo"
+                    placeholder="Contact Number / WhatsApp"
+                    required>
+
+                <input
+                    type="date"
+                    id="deliveryDate">
+
+                <input
+                    type="text"
+                    id="paymentMethods"
+                    placeholder="UPI, Cash, Bank Transfer">
+
+                <label>
+                    Upload Product Images
+                </label>
+
+                <input
+                    type="file"
+                    id="productImages"
+                    multiple
+                    accept="image/*">
+
+                <div id="previewContainer">
+
+                </div>
+
+                <div class="cf-turnstile" data-sitekey="0x4AAAAAADyHfUVt4-tqoZhk" data-theme="light" style="margin-bottom: 1rem;"></div>
+
+                <div class="verification-box">
+
+                    <h3>
+                        AI Verification
+                    </h3>
+
+                    <p>
+                        Uploaded images will be checked
+                        for visible damage before approval.
+                    </p>
+
+                    <div id="verificationStatus">
+
+                        Awaiting Upload...
+
+                    </div>
+
+                </div>
+
+                <button type="submit">
+
+                    Publish Listing
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </section>
+
+    <footer>
+
+        © 2026 UniThrift
+
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+    <script src="/js/auth-fetch.js"></script>
+    <script src="/js/sell.js"></script>
+
+</body>
+
+</html>

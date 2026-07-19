@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniThrift | UniBot AI Workspace</title>
+
+    <link rel="stylesheet" href="css/unibot.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body class="dark-theme">
+
+    <div class="unibot-bg" style="background-image:url('/images/unibotbg.jpg');"></div>
+
+    <!-- ============ NAVBAR ============ -->
+    <nav class="navbar">
+      <div class="navbar-inner">
+        <div class="brand-group">
+            <div class="logo">
+                <img src="/images/logo.jpg" alt="UniThrift" class="logo-mark">
+                UniThrift<span class="logo-version">2.0</span>
+            </div>
+            <div class="campus-select" id="campusSelectWrap">
+                <i class="fas fa-location-dot campus-select-icon"></i>
+                <input type="text" id="universitySelect" aria-label="Search your university" placeholder="IIT Kharagpur, Kolkata Campus" autocomplete="off">
+                <i class="fas fa-chevron-down campus-select-caret"></i>
+                <div class="campus-select-dropdown" id="campusSelectDropdown"></div>
+            </div>
+        </div>
+        <div class="nav-actions">
+            <button class="theme-switch" id="themeToggle" aria-label="Toggle theme">
+                <i class="fas fa-sun"></i>
+                <span class="theme-switch-knob"></span>
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="icon-btn" id="notifBtn" aria-label="Notifications">
+                <i class="fas fa-bell"></i>
+            </button>
+            <button class="icon-btn" id="cartBtn" style="position: relative;" aria-label="Cart">
+                <i class="fas fa-cart-shopping"></i>
+                <span id="cartBadge">0</span>
+            </button>
+            <button class="icon-btn" id="profileBtn" aria-label="Profile">
+                <i class="fas fa-user"></i>
+            </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ============ SIDE NAV ============ -->
+    <aside class="side-nav" id="sideNav">
+        <button class="side-nav-pin" id="sideNavPin" type="button" title="Pin sidebar open" aria-label="Pin sidebar open" aria-pressed="false">
+            <i class="fas fa-thumbtack"></i>
+        </button>
+        <nav class="side-nav-links">
+            <a href="/home" class="side-nav-link">
+                <i class="fas fa-house"></i><span>Home</span>
+            </a>
+            <a href="/marketplace" class="side-nav-link">
+                <i class="fas fa-magnifying-glass"></i><span>Explore</span>
+            </a>
+            <a href="/messages" class="side-nav-link">
+                <i class="fas fa-comment-dots"></i><span>Messages</span>
+            </a>
+            <a href="/chatbot" class="side-nav-link active">
+                <i class="fas fa-robot"></i><span>UniBot</span>
+            </a>
+            <a href="/orders" class="side-nav-link">
+                <i class="fas fa-box"></i><span>Orders</span>
+            </a>
+            <a href="/saved" class="side-nav-link">
+                <i class="fas fa-bookmark"></i><span>Saved</span>
+            </a>
+            <a href="/profile" class="side-nav-link">
+                <i class="fas fa-user"></i><span>Profile</span>
+            </a>
+            <a href="/settings" class="side-nav-link">
+                <i class="fas fa-gear"></i><span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="side-nav-upsell" id="sideNavUpsell">
+            <p class="side-nav-upsell-eyebrow">Need more power?</p>
+            <p class="side-nav-upsell-title">Upgrade to UniThrift Pro</p>
+            <ul class="side-nav-upsell-list">
+                <li><i class="fas fa-check"></i>Early access</li>
+                <li><i class="fas fa-check"></i>Advanced filters</li>
+                <li><i class="fas fa-check"></i>Priority support</li>
+                <li><i class="fas fa-check"></i>Unlimited searches</li>
+            </ul>
+            <button class="side-nav-upsell-btn" type="button">Upgrade now <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </aside>
+
+    <!-- ============ AI WORKSPACE ============ -->
+    <main class="workspace-main">
+
+        <div class="workspace-shell">
+
+            <section class="workspace-hero">
+                <div class="workspace-eyebrow">
+                    <span>AI WORKSPACE</span>
+                    <span class="live-pill"><span class="live-dot"></span>LIVE</span>
+                </div>
+                <p class="workspace-sub">Watching the agent think and work for you</p>
+
+                <form class="workspace-search" id="workspaceSearchForm">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <input type="text" id="workspaceSearchInput" placeholder="Find me a used Logitech G304 under ₹1500" autocomplete="off">
+                    <button type="submit" aria-label="Search"><i class="fas fa-arrow-right"></i></button>
+                </form>
+            </section>
+
+            <section id="compareSection" style="display:none;">
+                <div class="compare-grid" id="compareGrid"></div>
+            </section>
+
+            <section id="tableSection" style="display:none;">
+                <div class="compare-table-wrap">
+                    <p class="workspace-section-title">COMPARISON RESULT</p>
+                    <table class="compare-table" id="compareTable"></table>
+                </div>
+            </section>
+
+            <div class="workspace-answer" id="workspaceAnswer"></div>
+
+            <form class="unibot-input-bar" id="chatForm">
+                <textarea id="chatInput" placeholder="Ask UniBot anything..." rows="1" maxlength="2000"></textarea>
+                <button type="submit" class="unibot-send-btn" id="sendBtn" aria-label="Send message">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+            <p class="unibot-disclaimer">UniBot can make mistakes. Verify important details with the seller or UniThrift support before you buy or sell.</p>
+        </div>
+
+        <!-- ============ RIGHT RAIL ============ -->
+        <aside class="workspace-rail">
+
+            <div class="rail-card live-process-card">
+                <div class="rail-card-head">
+                    <h4>Live process</h4>
+                    <span class="pulse-bars" id="pulseBars"><span></span><span></span><span></span><span></span></span>
+                </div>
+                <ol class="process-steps" id="processSteps">
+                    <li class="process-step" data-step="0">
+                        <div class="process-step-dot-col">
+                            <div class="process-step-dot"><i class="fas fa-check"></i></div>
+                            <div class="process-step-line"></div>
+                        </div>
+                        <div class="process-step-body">
+                            <div class="process-step-title">Understanding request</div>
+                            <div class="process-step-meta">&mdash;</div>
+                        </div>
+                    </li>
+                    <li class="process-step" data-step="1">
+                        <div class="process-step-dot-col">
+                            <div class="process-step-dot"><i class="fas fa-check"></i></div>
+                            <div class="process-step-line"></div>
+                        </div>
+                        <div class="process-step-body">
+                            <div class="process-step-title">Searching listings</div>
+                            <div class="process-step-meta">&mdash;</div>
+                        </div>
+                    </li>
+                    <li class="process-step" data-step="2">
+                        <div class="process-step-dot-col">
+                            <div class="process-step-dot"><i class="fas fa-circle-dot"></i></div>
+                            <div class="process-step-line"></div>
+                        </div>
+                        <div class="process-step-body">
+                            <div class="process-step-title">Comparing prices</div>
+                            <div class="process-step-meta">&mdash;</div>
+                        </div>
+                    </li>
+                    <li class="process-step" data-step="3">
+                        <div class="process-step-dot-col">
+                            <div class="process-step-dot"><i class="fas fa-circle-dot"></i></div>
+                            <div class="process-step-line"></div>
+                        </div>
+                        <div class="process-step-body">
+                            <div class="process-step-title">Checking seller ratings</div>
+                            <div class="process-step-meta">&mdash;</div>
+                        </div>
+                    </li>
+                    <li class="process-step" data-step="4">
+                        <div class="process-step-dot-col">
+                            <div class="process-step-dot"><i class="fas fa-circle-dot"></i></div>
+                        </div>
+                        <div class="process-step-body">
+                            <div class="process-step-title">Final recommendation</div>
+                            <div class="process-step-meta">&mdash;</div>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+
+            <div class="rail-card cart-card">
+                <div class="rail-card-head">
+                    <h4>Your cart</h4>
+                    <button class="icon-btn" id="cartRailClose" style="width:30px;height:30px;font-size:0.75rem;" aria-label="Close cart">
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+                <div id="cartItemsWrap"></div>
+                <div class="cart-totals" id="cartTotals" style="display:none;">
+                    <div class="cart-totals-row"><span>Total items</span><span id="cartTotalItems">0</span></div>
+                    <div class="cart-totals-row"><span>Items cost</span><span id="cartItemsCost">₹0</span></div>
+                    <div class="cart-totals-row"><span>Shipping cost (25%)</span><span id="cartShipping">₹0</span></div>
+                    <div class="cart-totals-row total"><span>Order total</span><span class="amt" id="cartOrderTotal">₹0</span></div>
+                </div>
+                <button class="cart-cta" id="cartCheckoutBtn" disabled>
+                    Proceed to payment <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+        </aside>
+
+    </main>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/unibot.js"></script>
+</body>
+</html>

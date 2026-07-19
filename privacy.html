@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniThrift | Privacy Policy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="/css/privacy.css">
+    <link href="https://googleapis.com" rel="stylesheet">
+    <script>
+        document.documentElement.className = localStorage.getItem("theme") || "dark-theme";
+    </script>
+</head>
+<body class="dark-theme">
+<nav class="navbar">
+    <a href="/marketplace" class="logo" style="display: flex; align-items: center;">
+    <img src="/images/logo.jpg" alt="UniThrift Logo" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 10px rgba(139, 92, 246, 0.25);">
+</a>
+    <div class="nav-center">
+        <a href="/marketplace">Browse</a>
+        <button class="theme-toggle-link" id="navbarThemeToggle" type="button">
+            <i class="fas fa-sun"></i><i class="fas fa-moon"></i>
+            <span>Theme</span>
+        </button>
+        <a href="#">Deals</a>
+        <a href="/updates">Updates</a>
+    </div>
+    <div class="nav-right">
+        <button class="nav-icon-btn" onclick="window.location.href='/marketplace'"><i class="fas fa-store"></i></button>
+        <button class="nav-icon-btn" onclick="window.location.href='/profile'"><i class="fas fa-user"></i></button>
+    </div>
+</nav>
+
+<div class="page-wrap">
+
+    <div class="page-hero">
+        <p class="updated"><i class="fas fa-clock"></i> Last updated: July 2026</p>
+        <h1>Privacy Policy</h1>
+        <p>We take your privacy seriously. This policy explains what data we collect, why we collect it, and how you can control it.</p>
+    </div>
+
+    <div class="section">
+        <h2><i class="fas fa-database"></i> What We Collect</h2>
+        <table class="data-table">
+            <thead><tr><th>Data</th><th>Why We Collect It</th><th>Stored Where</th></tr></thead>
+            <tbody>
+                <tr><td>Email address</td><td>Account authentication</td><td>Supabase Auth</td></tr>
+                <tr><td>Name, college, location</td><td>Profile display & discovery</td><td>Supabase DB</td></tr>
+                <tr><td>Profile photo</td><td>Identity on listings & chat</td><td>Supabase Storage</td></tr>
+                <tr><td>College ID card</td><td>Student verification (reviewed then stored securely)</td><td>Supabase Storage (private)</td></tr>
+                <tr><td>PAN card image</td><td>Seller KYC verification</td><td>Supabase Storage (private)</td></tr>
+                <tr><td>Payment QR code</td><td>Enable buyers to pay sellers</td><td>Supabase Storage</td></tr>
+                <tr><td>Chat messages</td><td>Buyer-seller communication</td><td>Supabase DB</td></tr>
+                <tr><td>Listing data</td><td>Marketplace functionality</td><td>Supabase DB</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2><i class="fas fa-shield-halved"></i> How We Protect It</h2>
+        <ul>
+            <li>All data is stored on Supabase with Row Level Security (RLS) — you can only access your own data</li>
+            <li>Verification documents (College ID, PAN card) are stored in private buckets — not publicly accessible</li>
+            <li>Authentication uses industry-standard JWT tokens with short expiry and automatic refresh</li>
+            <li>All traffic is encrypted via HTTPS/TLS</li>
+            <li>We never sell your data to third parties</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2><i class="fas fa-robot"></i> AI Processing</h2>
+        <p>When you submit verification documents, they are sent to Google Gemini AI for automated review. Gemini checks whether the document appears to be a genuine College ID or PAN card. The image is processed in real-time and is not stored by Google for training purposes under their API terms.</p>
+        <p>The AI result (verified/rejected + confidence score) is stored in your profile. The actual document image stays in our private Supabase storage bucket and is only reviewed by UniThrift administrators.</p>
+    </div>
+
+    <div class="section">
+        <h2><i class="fas fa-handshake"></i> Third Parties</h2>
+        <ul>
+            <li><strong>Supabase</strong> — database, auth, storage (GDPR compliant)</li>
+            <li><strong>Google Gemini API</strong> — document verification AI (see Google's privacy policy)</li>
+            <li><strong>Google Fonts / FontAwesome</strong> — UI assets (CDN, no personal data)</li>
+        </ul>
+        <p style="margin-top:10px;">We do not use advertising networks, analytics trackers, or sell data to any marketing platforms.</p>
+    </div>
+
+    <div class="section">
+        <h2><i class="fas fa-person-circle-check"></i> Your Rights</h2>
+        <div class="rights-grid">
+            <div class="right-item"><i class="fas fa-eye"></i><h4>Access</h4><p>Request a copy of all data we hold about you.</p></div>
+            <div class="right-item"><i class="fas fa-pen"></i><h4>Correction</h4><p>Update your profile details anytime from your dashboard.</p></div>
+            <div class="right-item"><i class="fas fa-trash"></i><h4>Deletion</h4><p>Delete your account to remove your public data.</p></div>
+            <div class="right-item"><i class="fas fa-download"></i><h4>Portability</h4><p>Request an export of your listings and profile data.</p></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2><i class="fas fa-envelope"></i> Contact</h2>
+        <p>For any privacy concerns or data requests, contact us at <a href="mailto:rizzmax.hacks@gmail.com">rizzmax.hacks@gmail.com</a>. We respond within 48 hours.</p>
+    </div>
+
+</div>
+
+<footer class="site-footer">
+    <p>© 2026 UniThrift. For students, by students.</p>
+    <div class="footer-links">
+        <a href="/about">About</a>
+        <a href="/terms">Terms</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/help">Help</a>
+    </div>
+</footer>
+
+<script>
+document.body.className = localStorage.getItem("theme") || "dark-theme";
+document.getElementById("navbarThemeToggle").addEventListener("click", () => {
+    const next = document.body.classList.contains("dark-theme") ? "light-theme" : "dark-theme";
+    document.body.className = next;
+    document.documentElement.className = next;
+    localStorage.setItem("theme", next);
+});
+</script>
+</body>
+</html>

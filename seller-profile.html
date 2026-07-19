@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniThrift | Seller Profile</title>
+    <link rel="stylesheet" href="/css/seller-profile.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="dark-theme">
+
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <div class="logo" onclick="window.location.href='/marketplace'">
+                <img src="/images/logo.jpg" alt="UniThrift" class="logo-mark">
+                UniThrift
+            </div>
+            <div class="nav-actions">
+                <button class="icon-btn" onclick="window.location.href='/marketplace'">
+                    <i class="fas fa-store"></i> Back to Marketplace
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="seller-container" id="sellerContainer">
+
+        <!-- LOADING STATE -->
+        <div class="seller-loading" id="sellerLoading">
+            <div class="spinner"></div>
+            <p>Loading seller profile...</p>
+        </div>
+
+        <!-- ERROR STATE -->
+        <div class="seller-error" id="sellerError" style="display:none;">
+            <i class="fas fa-triangle-exclamation"></i>
+            <p id="sellerErrorMsg">Couldn't find this seller.</p>
+            <a href="/marketplace" class="btn-secondary">Back to Marketplace</a>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="seller-content" id="sellerContent" style="display:none;">
+
+            <section class="seller-hero">
+                <img id="sellerAvatar" class="seller-hero-avatar" src="" alt="Seller avatar">
+                <div class="seller-hero-info">
+                    <h1 id="sellerName">—</h1>
+                    <div class="seller-hero-badges" id="sellerBadges"></div>
+                    <p class="seller-hero-college" id="sellerCollege"></p>
+                </div>
+            </section>
+
+            <section class="seller-stats-grid" id="sellerStatsGrid">
+                <div class="stat-box">
+                    <span class="stat-value" id="statRating">—</span>
+                    <span class="stat-label">Rating</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value" id="statSold">—</span>
+                    <span class="stat-label">Items Sold</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value" id="statActive">—</span>
+                    <span class="stat-label">Active Listings</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value" id="statSince">—</span>
+                    <span class="stat-label">Member Since</span>
+                </div>
+            </section>
+
+            <section class="seller-listings-section">
+                <h2><i class="fas fa-th-large"></i> Listings from this seller</h2>
+                <div class="seller-listings-tabs">
+                    <button class="tab-btn active" data-tab="active">Active</button>
+                    <button class="tab-btn" data-tab="sold">Sold</button>
+                    <button class="tab-btn" data-tab="all">All</button>
+                </div>
+                <div class="seller-listings-grid" id="sellerListingsGrid"></div>
+            </section>
+
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="/js/seller-profile.js"></script>
+</body>
+</html>

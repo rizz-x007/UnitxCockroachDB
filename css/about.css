@@ -1,0 +1,67 @@
+/* =========================================================
+   UniThrift — ABOUT (page-specific)
+   Requires theme.css to be loaded first.
+   ========================================================= */
+
+.page-hero .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(139, 92, 246, 0.12);
+    color: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+.page-hero h1 { font-size: 2.4rem; }
+.page-hero p { max-width: 580px; margin: 0 auto; font-size: 1rem; }
+
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    box-shadow: 0 8px 30px var(--shadow);
+    transition: background 0.3s, border-color 0.3s;
+}
+.stat-card .num { font-size: 2.2rem; font-weight: 800; color: var(--accent); display: block; }
+.stat-card .lbl { font-size: 0.85rem; color: var(--muted); margin-top: 4px; font-weight: 500; }
+
+.value-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+.value-item {
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    transition: background 0.3s, border-color 0.3s;
+}
+.value-item i { font-size: 1.4rem; color: var(--accent); margin-bottom: 10px; display: block; }
+.value-item h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+.value-item p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+.cta-box {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(167, 139, 250, 0.1));
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 36px;
+    text-align: center;
+    margin-top: 40px;
+}
+.cta-box h3 { font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+.cta-box p { color: var(--muted); font-size: 0.92rem; margin-bottom: 20px; }
+
+@media (max-width: 768px) {
+    .page-hero h1 { font-size: 1.8rem; }
+    .stats-row { grid-template-columns: 1fr; }
+    .value-grid { grid-template-columns: 1fr; }
+}

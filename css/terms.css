@@ -1,0 +1,59 @@
+/* =========================================================
+   UniThrift — TERMS OF SERVICE (page-specific)
+   Requires theme.css to be loaded first.
+   ========================================================= */
+
+.page-wrap { max-width: 800px; }
+.page-hero { text-align: left; margin-bottom: 40px; }
+.page-hero h1 { font-size: 2.2rem; }
+
+.toc {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 32px;
+    transition: background 0.3s, border-color 0.3s;
+}
+.toc h3 {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+}
+.toc ol { padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+.toc ol li a { font-size: 0.92rem; color: var(--accent); font-weight: 500; }
+.toc ol li a:hover { color: var(--accent-hover); }
+
+.section { margin-bottom: 32px; }
+.section h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+}
+.section h2 i { color: var(--accent); font-size: 1.1rem; }
+.section p, .section li { font-size: 0.95rem; color: var(--muted); line-height: 1.85; }
+.section ul, .section ol { padding-left: 20px; display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.section p + p { margin-top: 12px; }
+
+.highlight-box {
+    background: var(--input-bg);
+    border-left: 4px solid var(--accent);
+    border-radius: 0 12px 12px 0;
+    padding: 16px 20px;
+    margin: 18px 0;
+    transition: background 0.3s;
+}
+.highlight-box p { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
+
+@media (max-width: 768px) {
+    .page-hero h1 { font-size: 1.8rem; }
+}

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniThrift | Checkout</title>
+    <!-- Links safely to your existing global product stylesheet -->
+    <link rel="stylesheet" href="/css/product.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .checkout-container {
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 30px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+        }
+        .checkout-item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px dashed var(--border);
+        }
+        .totals-box {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(0,0,0,0.15);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+        body.light-theme .totals-box { background: rgba(255,255,255,0.4); }
+        .grand-total {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+        .pay-btn {
+            width: 100%; padding: 16px; background: #10b981; color: white;
+            border: none; border-radius: 12px; font-weight: 700; font-size: 1.1rem;
+            margin-top: 20px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <main class="checkout-container">
+        <h2>Order Review & Payment</h2>
+        <div id="checkoutList" style="margin-top: 20px;"></div>
+        
+        <div class="totals-box">
+            <div class="checkout-item-row"><span>Items Cost:</span> <strong id="cSub">₹0</strong></div>
+            <div class="checkout-item-row"><span>Shipping (25%):</span> <strong id="cShip">₹0</strong></div>
+            <div class="checkout-item-row grand-total"><span>Total Due:</span> <span id="cTotal">₹0</span></div>
+        </div>
+        <button id="payBtn" class="pay-btn">Confirm & Pay Securely</button>
+    </main>
+
+    <script>
+        // Syncs perfectly with your user's light/dark setting automatically
+        document.body.classList.add(localStorage.getItem("theme") || "dark-theme");
+
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+        const container = document.getElementById("checkoutList");
+        let subtotal = 0;
+
+        cart.forEach(item => {
+            subtotal += Number(item.price);
+            container.innerHTML += `
+                <div class="checkout-item-row">
+                    <span>${item.title}</span>
+                    <strong>₹${Number(item.price).toLocaleString('en-IN')}</strong>
+                </div>`;
+        });
+
+        const ship = subtotal * 0.25;
+        document.getElementById("cSub").textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+        document.getElementById("cShip").textContent = `₹${ship.toLocaleString('en-IN')}`;
+        document.getElementById("cTotal").textContent = `₹${(subtotal + ship).toLocaleString('en-IN')}`;
+
+        document.getElementById("payBtn").addEventListener("click", () => {
+            alert("Payment processed successfully via UniThrift!");
+            localStorage.removeItem("cart");
+            window.location.href = "/marketplace";
+        });
+    </script>
+</body>
+</html>
