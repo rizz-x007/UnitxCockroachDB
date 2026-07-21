@@ -4,12 +4,16 @@ const pool = require("../config/cockroach");
 
 async function testConnection() {
   try {
-    console.log("Connecting...");
+    console.log("Checking tables...");
 
-    const result = await pool.query("SELECT NOW()");
+    const result = await pool.query(`
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = 'public'
+      ORDER BY table_name;
+    `);
 
-    console.log("Connected!");
-    console.log(result.rows);
+    console.table(result.rows);
 
     await pool.end();
   } catch (err) {
