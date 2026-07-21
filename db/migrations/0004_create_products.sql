@@ -1,38 +1,3 @@
-CREATE TABLE IF NOT EXISTS profiles (
-    id UUID PRIMARY KEY,
-
-    updated_at TIMESTAMPTZ DEFAULT now(),
-
-    username TEXT,
-    full_name TEXT,
-    avatar_url TEXT,
-
-    college TEXT,
-    location TEXT,
-    address TEXT,
-
-    student_verified BOOL DEFAULT false,
-    seller_verified BOOL DEFAULT false,
-
-    college_name TEXT,
-    location_name TEXT,
-
-    college_id_url TEXT,
-    pan_url TEXT,
-    payment_qr_url TEXT,
-
-    phone TEXT,
-
-    email_verified BOOL NOT NULL DEFAULT false,
-    is_admin BOOL NOT NULL DEFAULT false,
-
-    student_reviewed_at TIMESTAMPTZ,
-    student_reviewed_by UUID,
-
-    seller_reviewed_at TIMESTAMPTZ,
-    seller_reviewed_by UUID
-);
-
 CREATE TABLE IF NOT EXISTS products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
