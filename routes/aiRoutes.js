@@ -1,7 +1,7 @@
 // routes/aiRoutes.js
 const express = require('express');
 const router = express.Router();
-const { supabaseAdmin } = require('../config/supabase');
+const pool = require('../config/cockroach'); // CockroachDB Connection Pool
 const { asyncHandler } = require('../middleware/errorHandler');
 const { authenticateUser } = require('../middleware/auth');
 const { chatbotLimiter } = require('../middleware/security');
@@ -19,28 +19,40 @@ router.post('/chatbot/message', authenticateUser, chatbotLimiter, asyncHandler(a
 
     const reply = await chatbotChatTurn(message, history);
 
-    // Retrieve standard inventory candidates to match user search parameters
-    const { data: products } = await supabaseAdmin.from('products').select('*').eq('is_sold', false);
+    // Retrieve standard inventory candidates directly from CockroachDB
+    const productsResult = await pool.query('SELECT * FROM products WHERE is_sold = FALSE');
+    const products = productsResult.rows;
+
     const tokens = message.toLowerCase().split(/\s+/).filter(t => t.length > 2);
     let matches = [];
 
     if (products && tokens.length > 0) {
         matches = products.filter(p => {
             return tokens.some(t => 
-                p.title.toLowerCase().includes(t) || 
-                p.description.toLowerCase().includes(t) || 
-                p.category.toLowerCase().includes(t)
+                // Defensive null/undefined checks to prevent runtime errors if any column contains NULL [11.1]
+                (p.title ?? '').toLowerCase().includes(t) || 
+                (p.description ?? '').toLowerCase().includes(t) || 
+                (p.category ?? '').toLowerCase().includes(t)
             );
         }).slice(0, 4);
     }
 
     if (matches.length > 0) {
-        const { data: images } = await supabaseAdmin.from('product_images').select('product_id, image_url').in('product_id', matches.map(m => m.id));
+        const matchIds = matches.map(m => m.id);
+        const imagesResult = await pool.query(
+            'SELECT product_id, image_url FROM product_images WHERE product_id = ANY($1::uuid[])',
+            [matchIds]
+        );
+        
         const imageMap = {};
-        (images || []).forEach(img => {
+        imagesResult.rows.forEach(img => {
             if (!imageMap[img.product_id]) imageMap[img.product_id] = img.image_url;
         });
-        matches = matches.map(m => ({ ...m, image_url: imageMap[m.id] || 'https://placehold.co/600x400?text=UniThrift' }));
+
+        matches = matches.map(m => ({ 
+            ...m, 
+            image_url: imageMap[m.id] || 'https://placehold.co/600x400?text=UniThrift' 
+        }));
     }
 
     res.json({ success: true, reply, products: matches });

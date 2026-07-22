@@ -8,10 +8,6 @@ const supabase = createClient(
 );
 
 const PAGE_SIZE = 500;
-
-// Tables to migrate. Order here is just a tie-breaker for tables with
-// no FK relationship to each other — actual run order is computed from
-// real foreign keys in CockroachDB at runtime (see getMigrationOrder).
 const TABLES = [
   { name: "profiles", primaryKey: "id" },
   { name: "products", primaryKey: "id" },

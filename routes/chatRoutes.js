@@ -1,7 +1,7 @@
 // routes/chatRoutes.js
 const express = require('express');
 const router = express.Router();
-const { supabaseAdmin } = require('../config/supabase');
+const pool = require('../config/cockroach'); // CockroachDB Connection Pool
 const { asyncHandler } = require('../middleware/errorHandler');
 const { authenticateUser } = require('../middleware/auth');
 const { createNotification, broadcastRealtimeEvent } = require('../services/notificationService');
@@ -11,23 +11,29 @@ router.post('/room', authenticateUser, asyncHandler(async (req, res) => {
     const { product_id, buyer_id } = req.body;
     if (!product_id) return res.status(400).json({ success: false, message: 'Product ID required.' });
 
-    const { data: product } = await supabaseAdmin.from('products').select('user_id').eq('id', product_id).single();
-    if (!product) return res.status(404).json({ success: false, message: 'Item listing not found.' });
+    const productResult = await pool.query('SELECT user_id FROM products WHERE id = $1', [product_id]);
+    if (productResult.rows.length === 0) {
+        return res.status(404).json({ success: false, message: 'Item listing not found.' });
+    }
+    const product = productResult.rows[0];
 
+    // If the requester is the owner of the listing
     if (product.user_id === req.user.id) {
         if (buyer_id) {
-            const { data: existing } = await supabaseAdmin
-                .from('chat_rooms')
-                .select('id')
-                .eq('product_id', product_id)
-                .eq('buyer_id', buyer_id)
-                .maybeSingle();
-            if (!existing) return res.status(404).json({ success: false, message: 'Active buyer conversation not found.' });
-            return res.json({ success: true, room_id: existing.id });
+            const existingResult = await pool.query(
+                'SELECT id FROM chat_rooms WHERE product_id = $1 AND buyer_id = $2',
+                [product_id, buyer_id]
+            );
+            if (existingResult.rows.length === 0) {
+                return res.status(404).json({ success: false, message: 'Active buyer conversation not found.' });
+            }
+            return res.json({ success: true, room_id: existingResult.rows[0].id });
         }
 
-        const { data: rooms } = await supabaseAdmin.from('chat_rooms').select('id, buyer_id').eq('product_id', product_id);
-        if (!rooms || rooms.length === 0) {
+        const roomsResult = await pool.query('SELECT id, buyer_id FROM chat_rooms WHERE product_id = $1', [product_id]);
+        const rooms = roomsResult.rows;
+
+        if (rooms.length === 0) {
             return res.status(404).json({ success: false, message: 'No buyers have initiated chat yet.' });
         }
         if (rooms.length === 1) {
@@ -36,49 +42,67 @@ router.post('/room', authenticateUser, asyncHandler(async (req, res) => {
         return res.status(400).json({ success: false, code: 'MULTIPLE_BUYERS', message: 'Select user chat.' });
     }
 
-    const { data: existing } = await supabaseAdmin
-        .from('chat_rooms').select('id')
-        .eq('product_id', product_id).eq('buyer_id', req.user.id).maybeSingle();
+    // If the requester is the buyer
+    const existingResult = await pool.query(
+        'SELECT id FROM chat_rooms WHERE product_id = $1 AND buyer_id = $2',
+        [product_id, req.user.id]
+    );
 
-    if (existing) return res.json({ success: true, room_id: existing.id });
+    if (existingResult.rows.length > 0) {
+        return res.json({ success: true, room_id: existingResult.rows[0].id });
+    }
 
-    const { data: room, error } = await supabaseAdmin
-        .from('chat_rooms')
-        .insert({ product_id, buyer_id: req.user.id, seller_id: product.user_id })
-        .select().single();
-    if (error) throw error;
+    const roomResult = await pool.query(
+        'INSERT INTO chat_rooms (product_id, buyer_id, seller_id) VALUES ($1, $2, $3) RETURNING id',
+        [product_id, req.user.id, product.user_id]
+    );
 
-    res.json({ success: true, room_id: room.id });
+    res.json({ success: true, room_id: roomResult.rows[0].id });
 }));
 
 // Fetch user active room list
 router.get('/rooms', authenticateUser, asyncHandler(async (req, res) => {
-    const { data: rooms, error } = await supabaseAdmin
-        .from('chat_rooms')
-        .select('id, created_at, product_id, products(title), buyer_id, seller_id')
-        .or(`buyer_id.eq.${req.user.id},seller_id.eq.${req.user.id}`)
-        .order('created_at', { ascending: false });
-    if (error) throw error;
+    // Single query JOIN instead of nested collections
+    const roomsResult = await pool.query(`
+        SELECT cr.id, cr.created_at, cr.product_id, p.title AS product_title, cr.buyer_id, cr.seller_id
+        FROM chat_rooms cr
+        JOIN products p ON cr.product_id = p.id
+        WHERE cr.buyer_id = $1 OR cr.seller_id = $1
+        ORDER BY cr.created_at DESC
+    `, [req.user.id]);
 
-    const enriched = (rooms || []).map(r => ({
-        ...r,
+    // Map relational joins back to expected nested metadata objects for frontend consistency
+    const enriched = roomsResult.rows.map(r => ({
+        id: r.id,
+        created_at: r.created_at,
+        product_id: r.product_id,
+        products: { title: r.product_title },
+        buyer_id: r.buyer_id,
+        seller_id: r.seller_id,
         role: r.buyer_id === req.user.id ? 'Buyer' : 'Seller'
     }));
+    
     res.json({ success: true, rooms: enriched });
 }));
 
 // Fetch room messages
 router.get('/rooms/:room_id/messages', authenticateUser, asyncHandler(async (req, res) => {
-    const { data: room } = await supabaseAdmin.from('chat_rooms').select('buyer_id, seller_id').eq('id', req.params.room_id).single();
-    if (!room || (room.buyer_id !== req.user.id && room.seller_id !== req.user.id)) {
+    const roomResult = await pool.query('SELECT buyer_id, seller_id FROM chat_rooms WHERE id = $1', [req.params.room_id]);
+    if (roomResult.rows.length === 0) {
+        return res.status(404).json({ success: false, message: 'Chat room not found.' });
+    }
+    const room = roomResult.rows[0];
+
+    if (room.buyer_id !== req.user.id && room.seller_id !== req.user.id) {
         return res.status(403).json({ success: false, message: 'Access denied.' });
     }
 
-    const { data: messages, error } = await supabaseAdmin
-        .from('messages').select('*').eq('room_id', req.params.room_id).order('created_at', { ascending: true });
-    if (error) throw error;
+    const messagesResult = await pool.query(
+        'SELECT * FROM messages WHERE room_id = $1 ORDER BY created_at ASC',
+        [req.params.room_id]
+    );
 
-    res.json({ success: true, messages: messages || [] });
+    res.json({ success: true, messages: messagesResult.rows });
 }));
 
 // Send message (uses decoupled notification & realtime broadcast service layers)
@@ -86,18 +110,25 @@ router.post('/rooms/:room_id/messages', authenticateUser, asyncHandler(async (re
     const text = req.body.message_text?.trim();
     if (!text) return res.status(400).json({ success: false, message: 'Message text cannot be empty.' });
 
-    const { data: room } = await supabaseAdmin.from('chat_rooms').select('buyer_id, seller_id').eq('id', req.params.room_id).single();
-    if (!room || (room.buyer_id !== req.user.id && room.seller_id !== req.user.id)) {
+    const roomResult = await pool.query('SELECT buyer_id, seller_id FROM chat_rooms WHERE id = $1', [req.params.room_id]);
+    if (roomResult.rows.length === 0) {
+        return res.status(404).json({ success: false, message: 'Chat room not found.' });
+    }
+    const room = roomResult.rows[0];
+
+    if (room.buyer_id !== req.user.id && room.seller_id !== req.user.id) {
         return res.status(403).json({ success: false, message: 'Access denied.' });
     }
 
-    const { data: msg, error } = await supabaseAdmin
-        .from('messages').insert({ room_id: req.params.room_id, sender_id: req.user.id, message_text: text }).select().single();
-    if (error) throw error;
+    const insertResult = await pool.query(
+        'INSERT INTO messages (room_id, sender_id, message_text) VALUES ($1, $2, $3) RETURNING *',
+        [req.params.room_id, req.user.id, text]
+    );
+    const msg = insertResult.rows[0];
 
     const recipient = room.buyer_id === req.user.id ? room.seller_id : room.buyer_id;
-    const { data: profile } = await supabaseAdmin.from('profiles').select('username').eq('id', req.user.id).single();
-    const senderName = profile?.username || 'Student';
+    const profileResult = await pool.query('SELECT username FROM profiles WHERE id = $1', [req.user.id]);
+    const senderName = profileResult.rows[0]?.username || 'Student';
 
     // Broadcast instant socket event through the service layer
     await broadcastRealtimeEvent(recipient, 'new_msg_alert', { msg: text, senderName, roomId: req.params.room_id });

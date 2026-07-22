@@ -1,7 +1,8 @@
 // routes/listingRoutes.js
 const express = require('express');
 const router = express.Router();
-const { supabaseAdmin } = require('../config/supabase');
+const { supabaseAdmin } = require('../config/supabase'); // Retained solely for Supabase Storage bucket uploads
+const pool = require('../config/cockroach'); // CockroachDB Connection Pool
 const { asyncHandler } = require('../middleware/errorHandler');
 const { authenticateUser } = require('../middleware/auth');
 const { uploadImage } = require('../middleware/upload');
@@ -10,17 +11,20 @@ const { verifyProductWithAI, generateProductInsights } = require('../services/pr
 
 // Public: Get all listings
 router.get('/', asyncHandler(async (req, res) => {
-    const { data: products, error } = await supabaseAdmin
-        .from('products').select('*').order('created_at', { ascending: false });
-    if (error) throw error;
+    // Query products from CockroachDB
+    const productsResult = await pool.query('SELECT * FROM products ORDER BY created_at DESC');
+    const products = productsResult.rows;
 
-    const { data: images } = await supabaseAdmin.from('product_images').select('product_id, image_url');
+    // Query images from CockroachDB
+    const imagesResult = await pool.query('SELECT product_id, image_url FROM product_images');
+    const images = imagesResult.rows;
+
     const imageMap = {};
-    (images || []).forEach(img => {
+    images.forEach(img => {
         if (!imageMap[img.product_id]) imageMap[img.product_id] = img.image_url;
     });
 
-    const enriched = (products || []).map(p => ({
+    const enriched = products.map(p => ({
         ...p,
         image_url: imageMap[p.id] || 'https://placehold.co/600x400?text=UniThrift'
     }));
@@ -30,26 +34,26 @@ router.get('/', asyncHandler(async (req, res) => {
 
 // Public: Fetch standard single product details
 router.get('/:id', asyncHandler(async (req, res) => {
-    const { data: product, error } = await supabaseAdmin
-        .from('products').select('*').eq('id', req.params.id).single();
-    if (error) return res.status(404).json({ success: false, message: 'Item not found.' });
-    res.json({ success: true, product });
+    const productResult = await pool.query('SELECT * FROM products WHERE id = $1', [req.params.id]);
+    if (productResult.rows.length === 0) {
+        return res.status(404).json({ success: false, message: 'Item not found.' });
+    }
+    res.json({ success: true, product: productResult.rows[0] });
 }));
 
 // Public: Fetch product images
 router.get('/:id/images', asyncHandler(async (req, res) => {
-    const { data: images, error } = await supabaseAdmin
-        .from('product_images').select('*').eq('product_id', req.params.id);
-    if (error) throw error;
-    res.json({ success: true, images: images || [] });
+    const imagesResult = await pool.query('SELECT * FROM product_images WHERE product_id = $1', [req.params.id]);
+    res.json({ success: true, images: imagesResult.rows });
 }));
 
 // Public: Fetch product reviews
 router.get('/:id/reviews', asyncHandler(async (req, res) => {
-    const { data: reviews, error } = await supabaseAdmin
-        .from('reviews').select('*').eq('product_id', req.params.id).order('created_at', { ascending: true });
-    if (error) throw error;
-    res.json({ success: true, reviews: reviews || [] });
+    const reviewsResult = await pool.query(
+        'SELECT * FROM reviews WHERE product_id = $1 ORDER BY created_at ASC',
+        [req.params.id]
+    );
+    res.json({ success: true, reviews: reviewsResult.rows });
 }));
 
 // Private: Submit rating review
@@ -61,48 +65,70 @@ router.post('/:id/reviews', authenticateUser, asyncHandler(async (req, res) => {
         return res.status(400).json({ success: false, message: 'Valid rating (1-5) and review message are required.' });
     }
 
-    const { data, error } = await supabaseAdmin
-        .from('reviews').insert({ product_id: req.params.id, user_id: req.user.id, rating, review_text: text }).select().single();
-    if (error) throw error;
+    const insertQuery = `
+        INSERT INTO reviews (product_id, user_id, rating, review_text)
+        VALUES ($1, $2, $3, $4)
+        RETURNING *
+    `;
+    const result = await pool.query(insertQuery, [req.params.id, req.user.id, rating, text]);
 
-    res.json({ success: true, review: data });
+    res.json({ success: true, review: result.rows[0] });
 }));
 
 // Public: Get product AI recommendations & summaries
 router.get('/:id/ai-insights', asyncHandler(async (req, res) => {
-    const { data: product } = await supabaseAdmin.from('products').select('*').eq('id', req.params.id).single();
-    if (!product) return res.status(404).json({ success: false, message: 'Item listing not found.' });
+    const productResult = await pool.query('SELECT * FROM products WHERE id = $1', [req.params.id]);
+    if (productResult.rows.length === 0) {
+        return res.status(404).json({ success: false, message: 'Item listing not found.' });
+    }
+    const product = productResult.rows[0];
 
-    const { data: reviews } = await supabaseAdmin.from('reviews').select('rating, review_text').eq('product_id', req.params.id);
-    const reviewCount = (reviews || []).length;
+    const reviewsResult = await pool.query('SELECT rating, review_text FROM reviews WHERE product_id = $1', [req.params.id]);
+    const reviews = reviewsResult.rows;
+    const reviewCount = reviews.length;
 
-    // Return cached insights if review structures match
-    if (product.ai_insights && product.ai_insights_review_count === reviewCount) {
-        return res.json({ success: true, insights: product.ai_insights });
+    let cachedInsights = product.ai_insights;
+    if (typeof cachedInsights === 'string') {
+        try { cachedInsights = JSON.parse(cachedInsights); } catch (_) {}
     }
 
-    const insights = await generateProductInsights(product, reviews || []);
-    await supabaseAdmin.from('products').update({ ai_insights: insights, ai_insights_review_count: reviewCount }).eq('id', product.id);
+    // Return cached insights if review structures match
+    if (cachedInsights && product.ai_insights_review_count === reviewCount) {
+        return res.json({ success: true, insights: cachedInsights });
+    }
+
+    const insights = await generateProductInsights(product, reviews);
+
+    await pool.query(
+    'UPDATE products SET ai_insights = $1, ai_insights_review_count = $2 WHERE id = $3',
+    [insights, reviewCount, product.id]
+);
 
     res.json({ success: true, insights });
 }));
 
 // Private: My listings
 router.get('/my/listings', authenticateUser, asyncHandler(async (req, res) => {
-    const { data: products, error } = await supabaseAdmin
-        .from('products').select('*').eq('user_id', req.user.id).order('created_at', { ascending: false });
-    if (error) throw error;
+    const productsResult = await pool.query(
+        'SELECT * FROM products WHERE user_id = $1 ORDER BY created_at DESC',
+        [req.user.id]
+    );
+    const products = productsResult.rows;
 
-    const ids = (products || []).map(p => p.id);
+    const ids = products.map(p => p.id);
     const imageMap = {};
     if (ids.length > 0) {
-        const { data: images } = await supabaseAdmin.from('product_images').select('product_id, image_url').in('product_id', ids);
-        (images || []).forEach(img => {
+        // Enforce explicit static type casting for UUID array mapping inside CockroachDB
+        const imagesResult = await pool.query(
+            'SELECT product_id, image_url FROM product_images WHERE product_id = ANY($1::uuid[])',
+            [ids]
+        );
+        imagesResult.rows.forEach(img => {
             if (!imageMap[img.product_id]) imageMap[img.product_id] = img.image_url;
         });
     }
 
-    const enriched = (products || []).map(p => ({
+    const enriched = products.map(p => ({
         ...p,
         image_url: imageMap[p.id] || 'https://placehold.co/600x400?text=UniThrift'
     }));
@@ -110,7 +136,7 @@ router.get('/my/listings', authenticateUser, asyncHandler(async (req, res) => {
     res.json({ success: true, products: enriched });
 }));
 
-// Private: Upload image to staging storage bucket
+// Private: Upload image to staging storage bucket (Kept on Supabase Storage)
 router.post('/upload-image', authenticateUser, uploadLimiter, uploadImage.single('image'), asyncHandler(async (req, res) => {
     if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded.' });
 
@@ -138,56 +164,101 @@ router.post('/create', authenticateUser, verifyTurnstile, asyncHandler(async (re
         return res.status(400).json({ success: false, message: `Advisory Moderation Rejected: ${aiResult.reason}` });
     }
 
-    const { data: product, error } = await supabaseAdmin
-        .from('products')
-        .insert({
-            user_id: req.user.id,
+    // Checkout a client from the connection pool to run transaction block safely
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+
+        // Insert new product record into CockroachDB inside transaction
+        const insertProductQuery = `
+            INSERT INTO products (
+                user_id, title, category, price, condition, description, 
+                college_name, contact_no, delivery_date, payment_methods, 
+                ai_verified, ai_score
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+            RETURNING *
+        `;
+        const productResult = await client.query(insertProductQuery, [
+            req.user.id,
             title,
             category,
-            price: Number(price),
+            Number(price),
             condition,
             description,
             college_name,
             contact_no,
-            delivery_date,
+            delivery_date || null,
             payment_methods,
-            ai_verified: !aiResult.fallback,
-            ai_score: aiResult.confidence
-        })
-        .select().single();
-    if (error) throw error;
+            !aiResult.fallback,
+            aiResult.confidence
+        ]);
+        const product = productResult.rows[0];
 
-    await supabaseAdmin.from('product_images').insert(
-        image_urls.map(url => ({ product_id: product.id, image_url: url }))
-    );
+        // Insert associated image records into CockroachDB inside transaction
+        const valuesArr = [];
+        const valuePlaceholders = [];
+        let paramIndex = 1;
 
-    res.json({ success: true, product });
+        image_urls.forEach(url => {
+            valuesArr.push(product.id, url);
+            valuePlaceholders.push(`($${paramIndex}, $${paramIndex + 1})`);
+            paramIndex += 2;
+        });
+
+        const insertImagesQuery = `
+            INSERT INTO product_images (product_id, image_url)
+            VALUES ${valuePlaceholders.join(', ')}
+        `;
+        await client.query(insertImagesQuery, valuesArr);
+
+        await client.query('COMMIT');
+        res.json({ success: true, product });
+    } catch (err) {
+        await client.query('ROLLBACK');
+        throw err;
+    } finally {
+        client.release();
+    }
 }));
 
 // Private: Mark listing sold
 router.patch('/:id/sold', authenticateUser, asyncHandler(async (req, res) => {
-    const { data: item } = await supabaseAdmin.from('products').select('user_id').eq('id', req.params.id).single();
-    if (!item || item.user_id !== req.user.id) {
+    const itemResult = await pool.query('SELECT user_id FROM products WHERE id = $1', [req.params.id]);
+    if (itemResult.rows.length === 0 || itemResult.rows[0].user_id !== req.user.id) {
         return res.status(403).json({ success: false, message: 'Access denied.' });
     }
 
-    const { error } = await supabaseAdmin.from('products').update({ is_sold: true }).eq('id', req.params.id);
-    if (error) throw error;
+    // Attempt to update is_sold and update sold_at timestamp simultaneously if column is in schema
+    await pool.query('UPDATE products SET is_sold = true, sold_at = NOW() WHERE id = $1', [req.params.id]);
     res.json({ success: true });
 }));
 
 // Private: Delete listing
 router.delete('/:id', authenticateUser, asyncHandler(async (req, res) => {
-    const { data: item } = await supabaseAdmin.from('products').select('user_id').eq('id', req.params.id).single();
-    if (!item || item.user_id !== req.user.id) {
-        return res.status(403).json({ success: false, message: 'Access denied.' });
+    // Checkout a client from the connection pool to run transaction block safely
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+
+        const itemResult = await client.query('SELECT user_id FROM products WHERE id = $1', [req.params.id]);
+        if (itemResult.rows.length === 0 || itemResult.rows[0].user_id !== req.user.id) {
+            await client.query('ROLLBACK');
+            return res.status(403).json({ success: false, message: 'Access denied.' });
+        }
+
+        // Delete associations first, then target product
+        await client.query('DELETE FROM product_images WHERE product_id = $1', [req.params.id]);
+        await client.query('DELETE FROM products WHERE id = $1', [req.params.id]);
+
+        await client.query('COMMIT');
+        res.json({ success: true });
+    } catch (err) {
+        await client.query('ROLLBACK');
+        throw err;
+    } finally {
+        client.release();
     }
-
-    await supabaseAdmin.from('product_images').delete().eq('product_id', req.params.id);
-    const { error } = await supabaseAdmin.from('products').delete().eq('id', req.params.id);
-    if (error) throw error;
-
-    res.json({ success: true });
 }));
 
 module.exports = router;

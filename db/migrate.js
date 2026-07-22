@@ -95,7 +95,6 @@ async function migrate() {
     .filter((f) => f.endsWith(".sql"))
     .sort(); // relies on numeric prefixes, e.g. 0001_, 0002_
 
-  // Check every already-applied file for content drift before doing anything else.
   const drifted = [];
   for (const file of files) {
     if (!applied.has(file)) continue;

@@ -1,39 +1,44 @@
 // routes/notificationRoutes.js
 const express = require('express');
 const router = express.Router();
-const { supabaseAdmin } = require('../config/supabase');
+const pool = require('../config/cockroach'); // CockroachDB Connection Pool
 const { asyncHandler } = require('../middleware/errorHandler');
 const { authenticateUser } = require('../middleware/auth');
 
-// Get active notifications
+// Get active notifications (Retrieve 50 most recent)
 router.get('/', authenticateUser, asyncHandler(async (req, res) => {
-    const { data, error } = await supabaseAdmin
-        .from('notifications').select('*').eq('user_id', req.user.id).order('created_at', { ascending: false }).limit(50);
-    if (error) throw error;
-    res.json({ success: true, notifications: data || [] });
+    const result = await pool.query(
+        'SELECT * FROM notifications WHERE user_id = $1 ORDER BY created_at DESC LIMIT 50',
+        [req.user.id]
+    );
+    res.json({ success: true, notifications: result.rows });
 }));
 
 // Unread badge count
 router.get('/unread-count', authenticateUser, asyncHandler(async (req, res) => {
-    const { count, error } = await supabaseAdmin
-        .from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', req.user.id).eq('read', false);
-    if (error) throw error;
-    res.json({ success: true, count: count || 0 });
+    // Column "read" is wrapped in double quotes to protect the SQL reserved word
+    const result = await pool.query(
+        'SELECT COUNT(*)::int AS count FROM notifications WHERE user_id = $1 AND "read" = FALSE',
+        [req.user.id]
+    );
+    res.json({ success: true, count: result.rows[0].count });
 }));
 
 // Mark read
 router.post('/:id/read', authenticateUser, asyncHandler(async (req, res) => {
-    const { error } = await supabaseAdmin
-        .from('notifications').update({ read: true }).eq('id', req.params.id).eq('user_id', req.user.id);
-    if (error) throw error;
+    await pool.query(
+        'UPDATE notifications SET "read" = TRUE WHERE id = $1 AND user_id = $2',
+        [req.params.id, req.user.id]
+    );
     res.json({ success: true });
 }));
 
-// Clear all
+// Clear all (Mark all unread notifications as read)
 router.post('/read-all', authenticateUser, asyncHandler(async (req, res) => {
-    const { error } = await supabaseAdmin
-        .from('notifications').update({ read: true }).eq('user_id', req.user.id).eq('read', false);
-    if (error) throw error;
+    await pool.query(
+        'UPDATE notifications SET "read" = TRUE WHERE user_id = $1 AND "read" = FALSE',
+        [req.user.id]
+    );
     res.json({ success: true });
 }));
 
