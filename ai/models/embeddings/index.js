@@ -19,14 +19,15 @@ const PROVIDERS = {
  * Returns an instance of the requested embedding provider.
  *
  * @param {string} name - The provider name (e.g. "titan").
+ * @param {Object} [config] - Provider-specific construction config
  * @returns {import('./provider')} An instance implementing EmbeddingProvider.
  */
-function getEmbeddingProvider(name) {
+function getEmbeddingProvider(name, config) {
   const ProviderClass = PROVIDERS[name];
   if (!ProviderClass) {
     throw new Error(`Unknown embedding provider: ${name}`);
   }
-  return new ProviderClass();
+  return new ProviderClass(config);
 }
 
 module.exports = { getEmbeddingProvider, PROVIDERS };

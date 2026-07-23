@@ -48,10 +48,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        // FIX: Removed the inline onerror="..." attribute from <img>
         grid.innerHTML = filtered.map(p => `
             <div class="listing-card" data-id="${p.id}">
                 <div class="listing-img-wrap">
-                    <img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.title)}" onerror="this.src='https://placehold.co/600x400?text=UniThrift'">
+                    <img class="listing-img" src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.title)}">
                     ${p.is_sold ? '<span class="listing-sold-badge">SOLD</span>' : ''}
                 </div>
                 <div class="listing-body">
@@ -65,6 +66,14 @@ document.addEventListener("DOMContentLoaded", () => {
             card.addEventListener("click", () => {
                 window.location.href = `/product?id=${card.dataset.id}`;
             });
+
+            // FIX: Attach image error fallback programmatically
+            const img = card.querySelector(".listing-img");
+            if (img) {
+                img.addEventListener("error", () => {
+                    img.src = 'https://placehold.co/600x400?text=UniThrift';
+                });
+            }
         });
     }
 
@@ -118,10 +127,14 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const soldEl = document.getElementById("statSold");
-            if (soldEl) soldEl.textContent = stats.sold_listings;
+            if (soldEl) {
+                soldEl.textContent = stats.sold_listings;
+            }
 
             const activeEl = document.getElementById("statActive");
-            if (activeEl) activeEl.textContent = stats.active_listings;
+            if (activeEl) {
+                activeEl.textContent = stats.active_listings;
+            }
 
             const sinceEl = document.getElementById("statSince");
             if (sinceEl) {

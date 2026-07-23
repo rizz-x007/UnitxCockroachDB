@@ -309,9 +309,10 @@ function renderProducts(products) {
         if (isSold) card.classList.add("product-card--sold");
         card.style.animationDelay = `${Math.min(index, 14) * 35}ms`;
 
+        // FIX: Removed the inline onerror="..." attribute to satisfy strict CSP
         card.innerHTML = `
             <div class="product-image-wrap">
-                <img src="${escapeHtml(product.image_url)}" alt="${escapeHtml(product.title)}" class="product-image" onerror="this.src='https://placehold.co/600x400?text=UniThrift'">
+                <img src="${escapeHtml(product.image_url)}" alt="${escapeHtml(product.title)}" class="product-image">
                 ${isSold ? '<div class="sold-badge">SOLD</div>' : ''}
             </div>
             <div class="product-content">
@@ -327,6 +328,14 @@ function renderProducts(products) {
             </div>
         `;
         productsContainer.appendChild(card);
+
+        // FIX: Attach image load error fallback programmatically
+        const img = card.querySelector(".product-image");
+        if (img) {
+            img.addEventListener("error", () => {
+                img.src = 'https://placehold.co/600x400?text=UniThrift';
+            });
+        }
     });
 
     attachViewButtons();
@@ -344,7 +353,6 @@ function attachViewButtons() {
     });
 }
 
-// Uses centralized window.authFetch for operations
 function attachCartButtons() {
     document.querySelectorAll(".add-cart-btn").forEach(button => {
         if (button.disabled) return;
@@ -578,7 +586,7 @@ sellBtn.addEventListener("click", async () => {
 })();
 
 // ======================================
-// INIT
+// RUN
 // ======================================
 const savedTheme = localStorage.getItem("theme") || "dark-theme";
 document.body.classList.remove("dark-theme", "light-theme");
@@ -605,7 +613,6 @@ updateCartBadge();
     const token = localStorage.getItem("unithrift_session_token");
     if (token) sb.realtime.setAuth(token);
 
-    // Listens for centralized updates and refreshes the socket token seamlessly
     window.addEventListener("unithrift:tokens-updated", () => {
         const newToken = localStorage.getItem("unithrift_session_token");
         if (newToken) sb.realtime.setAuth(newToken);

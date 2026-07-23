@@ -469,14 +469,23 @@ async function loadListings() {
         const result = await res.json().catch(() => ({ success: false }));
 
         if (!result.success || !result.products?.length) {
+            // FIX: Removed the inline onclick attribute to comply with script-src-attr 'none'
             listingContainer.innerHTML = `
                 <div style="grid-column:1/-1; text-align:center; padding:48px 20px; color:var(--muted);">
                     <i class="fas fa-store" style="font-size:2rem; display:block; margin-bottom:12px; opacity:0.4;"></i>
                     <p style="font-size:0.9rem;">No listings yet.</p>
-                    <button class="btn btn-primary" style="margin-top:16px;" onclick="window.location.href='/sell'">
+                    <button id="createFirstListingBtn" class="btn btn-primary" style="margin-top:16px;">
                         <i class="fas fa-plus"></i> Create your first listing
                     </button>
                 </div>`;
+
+            // FIX: Attach event listener programmatically
+            const createFirstListingBtn = document.getElementById("createFirstListingBtn");
+            if (createFirstListingBtn) {
+                createFirstListingBtn.addEventListener("click", () => {
+                    window.location.href = '/sell';
+                });
+            }
             return;
         }
 
@@ -505,7 +514,7 @@ function renderListingCard(item) {
     const isArch   = item.status === "archived";
 
     const imgTag = item.image_url
-        ? `<img src="${item.image_url}" alt="${title}" loading="lazy">`
+        ? `<img class="my-listing-img" src="${item.image_url}" alt="${title}" loading="lazy">`
         : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:2rem;"><i class="fas fa-image"></i></div>`;
 
     const soldBadge = isSold ? `<span class="listing-sold-badge">Sold</span>` : "";

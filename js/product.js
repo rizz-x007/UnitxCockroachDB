@@ -462,6 +462,7 @@ async function loadSeller(sellerId) {
     }
 
     if (sellerInfo) {
+      // FIX: Removed the inline onclick attribute to comply with script-src-attr 'none'
       sellerInfo.innerHTML = `
         <div class="seller-profile-row">
             <img class="seller-avatar" src="${seller.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(seller.username || 'U')}&background=7c3aed&color=fff`}" alt="Avatar">
@@ -476,8 +477,16 @@ async function loadSeller(sellerId) {
             <div class="metric-row"><span>Rating</span><strong>Loading…</strong></div>
         </div>
 
-        <button class="view-seller-profile-btn" onclick="window.location.href='/seller-profile?id=${seller.id}'">View Seller Profile</button>
+        <button id="viewSellerProfileBtn" class="view-seller-profile-btn">View Seller Profile</button>
       `;
+
+      // FIX: Attach event listener programmatically
+      const viewSellerProfileBtn = document.getElementById("viewSellerProfileBtn");
+      if (viewSellerProfileBtn) {
+          viewSellerProfileBtn.addEventListener("click", () => {
+              window.location.href = `/seller-profile?id=${seller.id}`;
+          });
+      }
     }
 
     try {

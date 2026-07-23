@@ -11,14 +11,15 @@ router.post('/room', authenticateUser, asyncHandler(async (req, res) => {
     const { product_id, buyer_id } = req.body;
     if (!product_id) return res.status(400).json({ success: false, message: 'Product ID required.' });
 
-    const productResult = await pool.query('SELECT user_id FROM products WHERE id = $1', [product_id]);
+    // Query seller_id instead of user_id from products
+    const productResult = await pool.query('SELECT seller_id FROM products WHERE id = $1', [product_id]);
     if (productResult.rows.length === 0) {
         return res.status(404).json({ success: false, message: 'Item listing not found.' });
     }
     const product = productResult.rows[0];
 
-    // If the requester is the owner of the listing
-    if (product.user_id === req.user.id) {
+    // If the requester is the owner of the listing (referenced via seller_id)
+    if (product.seller_id === req.user.id) {
         if (buyer_id) {
             const existingResult = await pool.query(
                 'SELECT id FROM chat_rooms WHERE product_id = $1 AND buyer_id = $2',
@@ -52,9 +53,11 @@ router.post('/room', authenticateUser, asyncHandler(async (req, res) => {
         return res.json({ success: true, room_id: existingResult.rows[0].id });
     }
 
+    // FIX: Generate the primary key UUID dynamically using gen_random_uuid() 
+    // to bypass the missing default generator constraint on CockroachDB.
     const roomResult = await pool.query(
-        'INSERT INTO chat_rooms (product_id, buyer_id, seller_id) VALUES ($1, $2, $3) RETURNING id',
-        [product_id, req.user.id, product.user_id]
+        'INSERT INTO chat_rooms (id, product_id, buyer_id, seller_id) VALUES (gen_random_uuid(), $1, $2, $3) RETURNING id',
+        [product_id, req.user.id, product.seller_id]
     );
 
     res.json({ success: true, room_id: roomResult.rows[0].id });
